@@ -1,0 +1,81 @@
+version: '3.8'
+services:
+
+    php:
+        build:
+            args:
+                user: dev
+                uid: 1000
+            context: .
+            dockerfile: Dockerfile
+        image: todo-task-php
+        container_name: todo-task-php
+        restart: unless-stopped
+        working_dir: /var/www
+        depends_on:
+            - pgsql
+        volumes:
+            - ./:/var/www
+            - ./docker-compose/php/conf.d/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+            - ./docker-compose/php/conf.d/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        networks:
+            - todo-task
+
+    nginx:
+        image: nginx:alpine
+        container_name: todo-task-nginx
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./:/var/www
+            - ./docker-compose/nginx/conf.d/:/etc/nginx/conf.d/
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        networks:
+            - todo-task
+
+    pgsql:
+        image: postgres:latest
+        container_name: todo-task-pgsql
+        restart: unless-stopped
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: ${DB_DATABASE}
+            PGDATA: /var/lib/postgresql/data/pgdata
+        volumes:
+            - pgdata:/var/lib/postgresql/data/pgdata
+#            - ./docker-compose/mysql/my.cnf:/etc/mysql/conf.d/my_custom.cnf
+        networks:
+            - todo-task
+
+    pgadmin:
+        container_name: todi-task-pgadmin
+        image: dpage/pgadmin4:latest
+        environment:
+            PGADMIN_DEFAULT_EMAIL: "todo@api.list"
+            PGADMIN_DEFAULT_PASSWORD: "root"
+            PGADMIN_CONFIG_SERVER_MODE: "False"
+        volumes:
+            - pgadmin-data:/var/lib/pgadmin
+        ports:
+            - "5050:80"
+        restart: unless-stopped
+        networks:
+            - todo-task
+
+volumes:
+    pgdata:
+    pgadmin-data:
+    php:
+        driver: "local"
+
+networks:
+    todo-task:
+        driver: bridge
