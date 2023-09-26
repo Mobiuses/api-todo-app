@@ -20,9 +20,4 @@ class TaskRepository implements TaskRepositoryContract
     {
         return Task::query()->where('user_id', $userId)->get();
     }
-
-    public function getOneById()
-    {
-        // TODO: Implement getTaskById() method.
-    }
 }

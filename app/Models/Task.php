@@ -53,6 +53,14 @@ class Task extends Model
     }
 
     /**
+     * @return int
+     */
+    public function getUserId(): int
+    {
+        return $this->user_id;
+    }
+
+    /**
      * @return string
      */
     public function getTitle(): string
@@ -144,6 +152,18 @@ class Task extends Model
     public function setStatus(string $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @param  string  $datetime
+     *
+     * @return $this
+     */
+    public function setCompletedAt(string $datetime): self
+    {
+        $this->completed_at = $datetime;
 
         return $this;
     }

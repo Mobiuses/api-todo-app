@@ -9,8 +9,32 @@ use App\Modules\Core\DTOs\TaskDTO;
 
 interface TaskManagerContract
 {
-    public function create(TaskDTO $taskDTO): Task;
-    public function update();
-    public function resolve();
-    public function delete();
+    /**
+     * @param  TaskDTO  $taskDTO
+     *
+     * @return void
+     */
+    public function create(TaskDTO $taskDTO): void;
+
+    /**
+     * @param  Task  $task
+     * @param  TaskDTO  $taskDTO
+     *
+     * @return void
+     */
+    public function update(Task $task, TaskDTO $taskDTO): void;
+
+    /**
+     * @param  Task  $task
+     *
+     * @return void
+     */
+    public function resolve(Task $task): void;
+
+    /**
+     * @param  Task  $task
+     *
+     * @return void
+     */
+    public function delete(Task $task): void;
 }

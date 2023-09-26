@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Api\Tasks\Requests;
 
 use App\Modules\Core\ORM\Enums\TaskPriorityEnum;
@@ -9,7 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
 
-class TaskCreateRequest extends FormRequest
+class TaskCreateUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -43,6 +45,7 @@ class TaskCreateRequest extends FormRequest
      */
     protected function failedValidation(Validator $validator)
     {
+        dd($this->request->all());
         $response = new Response([
             'status' => 'error',
             'messages' => $validator->errors()

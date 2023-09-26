@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('api/tasks')->middleware(['api', 'auth:api'])->group(static function () {
     Route::get('/', [TaskController::class, 'list']);
     Route::post('/', [TaskController::class, 'create']);
-    Route::put('/', [TaskController::class, 'update']);
-    Route::patch('/', [TaskController::class, 'resolve']);
-    Route::delete('/', [TaskController::class, 'delete']);
+    Route::put('/{task}', [TaskController::class, 'update']);
+    Route::patch('/{task}', [TaskController::class, 'resolve']);
+    Route::delete('/{task}', [TaskController::class, 'delete']);
 });

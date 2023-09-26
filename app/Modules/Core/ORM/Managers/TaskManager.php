@@ -6,7 +6,9 @@ namespace App\Modules\Core\ORM\Managers;
 
 use App\Models\Task;
 use App\Modules\Core\DTOs\TaskDTO;
+use App\Modules\Core\ORM\Enums\TaskStatusEnum;
 use App\Modules\Core\ORM\Managers\Contracts\TaskManagerContract;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class TaskManager implements TaskManagerContract
@@ -14,9 +16,9 @@ class TaskManager implements TaskManagerContract
     /**
      * @param  TaskDTO  $taskDTO
      *
-     * @return Task
+     * @return void
      */
-    public function create(TaskDTO $taskDTO): Task
+    public function create(TaskDTO $taskDTO): void
     {
         $task = new Task();
         $task->setTitle($taskDTO->getTitle())
@@ -25,22 +27,45 @@ class TaskManager implements TaskManagerContract
              ->setStatus($taskDTO->getStatus());
 
         Auth::user()->tasks()->save($task);
-
-        return $task;
     }
 
-    public function update()
+    /**
+     * @param  Task  $task
+     * @param  TaskDTO  $taskDTO
+     *
+     * @return void
+     */
+    public function update(Task $task, TaskDTO $taskDTO): void
     {
-        // TODO: Implement updateTask() method.
+        $task->setTitle($taskDTO->getTitle())
+             ->setDescription($taskDTO->getDescription())
+             ->setPriority($taskDTO->getPriority());
+
+        if ($task->isDirty()) {
+            $task->save();
+        }
     }
 
-    public function resolve()
+    /**
+     * @param  Task  $task
+     *
+     * @return void
+     */
+    public function resolve(Task $task): void
     {
-        // TODO: Implement resolveTask() method.
+        $task->setStatus(TaskStatusEnum::DONE->value);
+        $task->setCompletedAt(Carbon::now()->toDateTimeString());
+
+        $task->save();
     }
 
-    public function delete()
+    /**
+     * @param  Task  $task
+     *
+     * @return void
+     */
+    public function delete(Task $task): void
     {
-        // TODO: Implement deleteTask() method.
+        $task->delete();
     }
 }

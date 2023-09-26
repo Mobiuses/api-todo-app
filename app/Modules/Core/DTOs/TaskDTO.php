@@ -7,7 +7,7 @@ namespace App\Modules\Core\DTOs;
 use App\Modules\Core\ORM\Enums\TaskPriorityEnum;
 use App\Modules\Core\ORM\Enums\TaskStatusEnum;
 
-class TaskDTO
+final class TaskDTO
 {
     /**
      * @param  string  $title
@@ -21,13 +21,28 @@ class TaskDTO
         private ?int $priority = null,
         private ?string $status = null
     ) {
-        if (!$this->priority) {
+        if ( ! $this->priority) {
             $this->priority = TaskPriorityEnum::PRIORITY_1->value;
         }
 
-        if (!$this->status) {
+        if ( ! $this->status) {
             $this->status = TaskStatusEnum::TODO->value;
         }
+    }
+
+    /**
+     * @param  array  $data
+     *
+     * @return static
+     */
+    static public function createFromArray(array $data): self
+    {
+        return new self(
+            $data['title'] ?? null,
+            $data['description'] ?? null,
+            $data['priority'] ?? null,
+            $data['status'] ?? null,
+        );
     }
 
     /**

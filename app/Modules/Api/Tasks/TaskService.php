@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modules\Api\Tasks;
 
+use App\Models\Task;
 use App\Modules\Api\Tasks\Contracts\TaskServiceContract;
-use App\Modules\Api\Tasks\Requests\TaskCreateRequest;
+use App\Modules\Api\Tasks\Exceptions\TaskBelongsToAnotherUserException;
 use App\Modules\Core\DTOs\TaskDTO;
 use App\Modules\Core\ORM\Managers\Contracts\TaskManagerContract;
+use Illuminate\Support\Facades\Auth;
 
 class TaskService implements TaskServiceContract
 {
@@ -23,27 +25,56 @@ class TaskService implements TaskServiceContract
         // TODO: Implement getTasks() method.
     }
 
-    public function create(TaskCreateRequest $request): void
+    public function create(TaskDTO $taskDTO): void
     {
-        $this->taskManager->create(new TaskDTO(
-            $request->get('title'),
-            $request->get('description'),
-            $request->get('priority'),
-        ));
+        $this->taskManager->create($taskDTO);
     }
 
-    public function update()
+    /**
+     * @param  Task  $task
+     * @param  TaskDTO  $taskDTO
+     *
+     * @return void
+     * @throws TaskBelongsToAnotherUserException
+     */
+    public function update(Task $task, TaskDTO $taskDTO): void
     {
-        // TODO: Implement UpdateTask() method.
+        if (Auth::id() !== $task->getUserId()) {
+            throw new TaskBelongsToAnotherUserException;
+        }
+
+        $this->taskManager->update($task, $taskDTO);
     }
 
-    public function resolve()
+    /**
+     * @param  Task  $task
+     * @param  int  $userId
+     *
+     * @return void
+     * @throws TaskBelongsToAnotherUserException
+     */
+    public function resolve(Task $task, int $userId): void
     {
-        // TODO: Implement ResolveTask() method.
+        if ($userId !== $task->getUserId()) {
+            throw new TaskBelongsToAnotherUserException;
+        }
+
+        $this->taskManager->resolve($task);
     }
 
-    public function delete()
+    /**
+     * @param  Task  $task
+     * @param  int  $userId
+     *
+     * @return void
+     * @throws TaskBelongsToAnotherUserException
+     */
+    public function delete(Task $task, int $userId): void
     {
-        // TODO: Implement DeleteTask() method.
+        if ($userId !== $task->getUserId()) {
+            throw new TaskBelongsToAnotherUserException;
+        }
+
+        $this->taskManager->delete($task);
     }
 }
