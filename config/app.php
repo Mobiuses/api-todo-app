@@ -172,6 +172,8 @@ return [
          * Custom Application Service Providers...
          */
         App\Modules\Api\Auth\AuthServiceProvider::class,
+        App\Modules\Core\ORM\ORMServiceProvider::class,
+        App\Modules\Api\Tasks\TaskServiceProvider::class
 
     ])->toArray(),
 
