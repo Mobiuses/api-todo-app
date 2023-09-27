@@ -8,12 +8,16 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Task extends Model
 {
     use HasFactory, HasUuids;
 
     const UPDATED_AT = null;
+
+    public const SORT_AVAILABLE_BY = ['priority', 'created_at', 'completed_at'];
+
 
     /**
      * The attributes that are mass assignable.
@@ -24,6 +28,7 @@ class Task extends Model
         'title',
         'description',
         'priority',
+        'parent_id'
     ];
 
     /**
@@ -42,6 +47,38 @@ class Task extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function subTask(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function subTasks(): HasMany
+    {
+        return $this->subTask()->with('subTasks');
+    }
+
+    /**
+     * @return Task
+     */
+    public function root(): Task
+    {
+        return $this->parent ? $this->parent->root() : $this;
     }
 
     /**
@@ -106,6 +143,18 @@ class Task extends Model
     public function getCompletedAt(): ?string
     {
         return $this->completed_at?->toDateTimeString();
+    }
+
+    /**
+     * @param  string  $parentId
+     *
+     * @return $this
+     */
+    public function setParentId(string $parentId): self
+    {
+        $this->parent_id = $parentId;
+
+        return $this;
     }
 
     /**

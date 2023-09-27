@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('parent_id')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->enum('status', TaskStatusEnum::values());
             $table->enum('priority', TaskPriorityEnum::values());

@@ -6,24 +6,21 @@ namespace App\Modules\Api\Tasks\Requests;
 
 use App\Models\Task;
 use App\Modules\Core\ORM\Enums\TaskPriorityEnum;
+use App\Modules\Core\ORM\Enums\TaskStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
 
-class TaskCreateUpdateRequest extends FormRequest
+class TaskFilterRequest extends FormRequest
 {
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        if ($parentId = $this->request->get('parent_id')) {
-            return Task::where('id', $parentId)->where('user_id', Auth::id())->exists();
-        }
-
         return true;
     }
 
@@ -35,10 +32,13 @@ class TaskCreateUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'       => 'string|required|min:1|max:255',
-            'description' => 'string|required|max:100000',
-            'priority'    => ['string', Rule::in(TaskPriorityEnum::values())],
-            'parent_id' => 'string|nullable|exists:tasks,id'
+            'title'           => 'nullable|string|min:1|max:255',
+            'description'     => 'nullable|string|max:100000',
+            'priority_before' => ['required_with:priority_after', 'nullable', 'numeric', Rule::in(TaskPriorityEnum::values())],
+            'priority_after'  => ['required_with:priority_before', 'nullable', 'numeric', Rule::in(TaskPriorityEnum::values()), 'lte:priority_before'],
+            'status'          => ['nullable', 'string', Rule::in(TaskStatusEnum::values())],
+            'sort_by.0'         => ['nullable', 'string', Rule::in(Task::SORT_AVAILABLE_BY)],
+            'sort_by.1'         => 'nullable|string|in:asc,desc',
         ];
     }
 
@@ -46,6 +46,7 @@ class TaskCreateUpdateRequest extends FormRequest
      * Handle a failed validation attempt.
      *
      * @param  Validator  $validator
+     *
      * @return void
      *
      * @throws ValidationException
@@ -53,8 +54,8 @@ class TaskCreateUpdateRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         $response = new Response([
-            'status' => 'error',
-            'messages' => $validator->errors()
+            'status'   => 'error',
+            'messages' => $validator->errors(),
         ], Response::HTTP_UNPROCESSABLE_ENTITY);
 
         throw new ValidationException($validator, $response);

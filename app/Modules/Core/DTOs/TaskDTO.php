@@ -14,12 +14,14 @@ final class TaskDTO
      * @param  string  $description
      * @param  int|null  $priority
      * @param  string|null  $status
+     * @param  string|null  $parent_id
      */
     public function __construct(
         private string $title,
         private string $description,
         private ?int $priority = null,
-        private ?string $status = null
+        private ?string $status = null,
+        private ?string $parent_id = null,
     ) {
         if ( ! $this->priority) {
             $this->priority = TaskPriorityEnum::PRIORITY_1->value;
@@ -42,6 +44,7 @@ final class TaskDTO
             $data['description'] ?? null,
             $data['priority'] ?? null,
             $data['status'] ?? null,
+            $data['parent_id'] ?? null,
         );
     }
 
@@ -75,6 +78,14 @@ final class TaskDTO
     public function getStatus(): string
     {
         return $this->status;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getParentId(): ?string
+    {
+        return $this->parent_id;
     }
 
 }

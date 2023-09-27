@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Api\Tasks\Resources;
 
 use Illuminate\Http\Request;
@@ -22,6 +24,7 @@ class TaskResource extends JsonResource
             'status' => $this->getStatus(),
             'created_at' => $this->getCreatedAt(),
             'completed_at' => $this->getCompletedAt(),
+            'sub_tasks' => $this->subTasks
         ];
     }
 }

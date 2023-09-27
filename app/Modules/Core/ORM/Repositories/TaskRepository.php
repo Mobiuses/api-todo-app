@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace App\Modules\Core\ORM\Repositories;
 
-use App\Models\Task;
+use App\Modules\Api\Tasks\Filters\TaskFilter;
 use App\Modules\Core\ORM\Repositories\Contracts\TaskRepositoryContract;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class TaskRepository implements TaskRepositoryContract
 {
 
     /**
      * @param  int  $userId
+     * @param  TaskFilter  $filter
      *
-     * @return Collection
+     * @return LengthAwarePaginator
      */
-    public function getAllByUserId(int $userId): Collection
+    public function getList(int $userId, TaskFilter $filter): LengthAwarePaginator
     {
-        return Task::query()->where('user_id', $userId)->get();
+        return $filter->getQuery()
+                      ->where('user_id', $userId)
+                      ->paginate(perPage: $filter->getPerPage(), page: $filter->getPage());
     }
 }

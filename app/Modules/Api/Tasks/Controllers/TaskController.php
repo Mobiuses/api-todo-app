@@ -8,11 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Task;
 use App\Modules\Api\Tasks\Contracts\TaskServiceContract;
 use App\Modules\Api\Tasks\Exceptions\TaskBelongsToAnotherUserException;
+use App\Modules\Api\Tasks\Filters\TaskFilter;
 use App\Modules\Api\Tasks\Requests\TaskCreateUpdateRequest;
+use App\Modules\Api\Tasks\Requests\TaskFilterRequest;
 use App\Modules\Api\Tasks\Resources\TaskResource;
 use App\Modules\Core\DTOs\TaskDTO;
 use App\Modules\Core\ORM\Repositories\Contracts\TaskRepositoryContract;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -31,12 +34,19 @@ class TaskController extends Controller
     }
 
     /**
+     * @param  TaskFilter  $filter
+     *
      * @return AnonymousResourceCollection
      */
-    public function list(): AnonymousResourceCollection
+    public function list(TaskFilterRequest $request, TaskFilter $filter): AnonymousResourceCollection
     {
+        $tasks = $this->taskRepository->getList(
+            Auth::id(),
+            $filter
+        );
+
         return TaskResource::collection(
-            $this->taskRepository->getAllByUserId(Auth::id())
+            $tasks
         );
     }
 

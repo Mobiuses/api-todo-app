@@ -24,7 +24,8 @@ class TaskManager implements TaskManagerContract
         $task->setTitle($taskDTO->getTitle())
              ->setDescription($taskDTO->getDescription())
              ->setPriority($taskDTO->getPriority())
-             ->setStatus($taskDTO->getStatus());
+             ->setStatus($taskDTO->getStatus())
+             ->setParentId($taskDTO->getParentId());
 
         Auth::user()->tasks()->save($task);
     }
