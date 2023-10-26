@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Modules\Core\ORM\Enums\TaskStatusEnum;
 use App\Modules\Core\ORM\Traits\Searchable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -81,6 +82,30 @@ class Task extends Model
     public function root(): Task
     {
         return $this->parent ? $this->parent->root() : $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isResolvable(): bool
+    {
+        foreach ($this->subTasks as $task) {
+            if ( ! $task->isDone()) {
+                return false;
+            }
+
+            return $task->isResolvable();
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDone(): bool
+    {
+        return $this->status === TaskStatusEnum::DONE->value;
     }
 
     /**

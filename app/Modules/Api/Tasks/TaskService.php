@@ -65,7 +65,11 @@ class TaskService implements TaskServiceContract
             throw new TaskBelongsToAnotherUserException;
         }
 
-        $this->taskManager->resolve($task);
+        dd($task->isResolvable());
+
+        if ($task->isResolvable()) {
+            $this->taskManager->resolve($task);
+        }
     }
 
     /**
