@@ -2,6 +2,13 @@ SHELL ?= /bin/bash
 
 ARGS = $(filter-out $@,$(MAKECMDGOALS))
 
+build:
+	cp .env.local .env
+	make docker-build
+	make composer-install
+	make migrate-fresh
+	make fix-permissions
+
 composer-require:
 	docker-compose run composer composer require ${ARGS}
 
