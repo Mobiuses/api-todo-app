@@ -51,7 +51,7 @@ cache-clear:
 	#docker-compose exec php php artisan config:clear
 
 fix-permissions:
-	docker-compose exec php chown -R 1000:1001 .
+	docker-compose exec php chmod -R 777 .
 
 test:
 	docker-compose exec php php artisan test
