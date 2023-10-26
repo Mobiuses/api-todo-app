@@ -1,3 +1,10 @@
+SHELL ?= /bin/bash
+
+ARGS = $(filter-out $@,$(MAKECMDGOALS))
+
+composer-require:
+	docker-compose run composer composer require ${ARGS}
+
 docker-build:
 	docker-compose down
 	docker-compose build
@@ -13,7 +20,7 @@ docker-restart:
 	docker-compose up -d
 
 composer-install:
-	docker-compose exec php composer install
+	docker-compose run composer composer install
 
 migrate-fresh:
 	docker-compose exec php php artisan migrate:fresh --seed

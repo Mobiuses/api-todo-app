@@ -6,12 +6,21 @@ namespace App\Modules\Api\Tasks\Contracts;
 
 use App\Models\Task;
 use App\Modules\Api\Tasks\Exceptions\TaskBelongsToAnotherUserException;
+use App\Modules\Api\Tasks\Filters\TaskFilter;
 use App\Modules\Core\DTOs\TaskDTO;
 
 interface TaskServiceContract
 {
-    public function getAll();
+    /**
+     * @return mixed
+     */
+    public function getList(int $userId, TaskFilter $filter);
 
+    /**
+     * @param  TaskDTO  $taskDTO
+     *
+     * @return mixed
+     */
     public function create(TaskDTO $taskDTO);
 
     /**

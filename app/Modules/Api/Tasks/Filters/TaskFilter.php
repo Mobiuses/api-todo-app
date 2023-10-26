@@ -5,21 +5,28 @@ declare(strict_types=1);
 namespace App\Modules\Api\Tasks\Filters;
 
 use App\Models\Task;
-use Carbon\Carbon;
+use App\Modules\Core\ORM\Repositories\Contracts\TaskRepositoryContract;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 
 class TaskFilter extends QueryFilter
 {
     /**
-     * @var int
+     * @var TaskRepositoryContract
      */
-    private int $page = 1;
+    private readonly TaskRepositoryContract $taskRepository;
 
     /**
-     * @var int
+     * @param  Request|null  $request
      */
-    private int $perPage = 10;
+    public function __construct(Request $request = null)
+    {
+        parent::__construct($request);
+
+        $this->taskRepository = App::make(TaskRepositoryContract::class);
+    }
 
     /**
      * @param  string  $status
@@ -32,13 +39,15 @@ class TaskFilter extends QueryFilter
     }
 
     /**
-     * @param  string  $title
+     * @param  string  $text
      *
      * @return void
      */
-    public function title(string $title): void
+    public function search(string $text): void
     {
-        $this->builder->where('title', strtolower($title));
+        $ids = $this->taskRepository->search($text, $this->page, $this->perPage);
+
+        $this->builder->whereIn('id', $ids);
     }
 
     /**

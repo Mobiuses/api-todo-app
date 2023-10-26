@@ -13,9 +13,7 @@ use App\Modules\Api\Tasks\Requests\TaskCreateUpdateRequest;
 use App\Modules\Api\Tasks\Requests\TaskFilterRequest;
 use App\Modules\Api\Tasks\Resources\TaskResource;
 use App\Modules\Core\DTOs\TaskDTO;
-use App\Modules\Core\ORM\Repositories\Contracts\TaskRepositoryContract;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -24,29 +22,23 @@ class TaskController extends Controller
 {
 
     /**
-     * @param  TaskRepositoryContract  $taskRepository
      * @param  TaskServiceContract  $taskService
      */
     public function __construct(
-        readonly private TaskRepositoryContract $taskRepository,
         readonly private TaskServiceContract $taskService,
     ) {
     }
 
     /**
+     * @param  TaskFilterRequest  $request
      * @param  TaskFilter  $filter
      *
      * @return AnonymousResourceCollection
      */
     public function list(TaskFilterRequest $request, TaskFilter $filter): AnonymousResourceCollection
     {
-        $tasks = $this->taskRepository->getList(
-            Auth::id(),
-            $filter
-        );
-
         return TaskResource::collection(
-            $tasks
+            $this->taskService->getList(Auth::id(), $filter)
         );
     }
 

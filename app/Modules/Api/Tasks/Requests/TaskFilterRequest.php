@@ -32,8 +32,7 @@ class TaskFilterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'           => 'nullable|string|min:1|max:255',
-            'description'     => 'nullable|string|max:100000',
+            'search'           => 'string|min:1|max:100',
             'priority_before' => ['required_with:priority_after', 'nullable', 'numeric', Rule::in(TaskPriorityEnum::values())],
             'priority_after'  => ['required_with:priority_before', 'nullable', 'numeric', Rule::in(TaskPriorityEnum::values()), 'lte:priority_before'],
             'status'          => ['nullable', 'string', Rule::in(TaskStatusEnum::values())],

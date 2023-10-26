@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Modules\Core\ORM\Traits\Searchable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use JetBrains\PhpStorm\ArrayShape;
 
 class Task extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, Searchable;
 
     const UPDATED_AT = null;
-
+    private const ES_INDEX_NAME = 'tasks';
     public const SORT_AVAILABLE_BY = ['priority', 'created_at', 'completed_at'];
 
 
@@ -215,5 +217,25 @@ class Task extends Model
         $this->completed_at = $datetime;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    #[ArrayShape(['id' => "string", 'title' => "string", 'description' => "string"])]
+    public function toSearchIndex(): array
+    {
+        return [
+            'title' => $this->getTitle(),
+            'description' => $this->getDescription(),
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public static function getSearchIndexStatic(): string
+    {
+        return self::ES_INDEX_NAME;
     }
 }

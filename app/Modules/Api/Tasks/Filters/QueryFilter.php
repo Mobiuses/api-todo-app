@@ -10,6 +10,16 @@ use Illuminate\Http\Request;
 abstract class QueryFilter
 {
     /**
+     * @var int
+     */
+    protected int $page = 1;
+
+    /**
+     * @var int
+     */
+    protected int $perPage = 10;
+
+    /**
      * @var Request
      */
     protected Request $request;
@@ -26,6 +36,12 @@ abstract class QueryFilter
     {
         if ($request) {
             $this->request = $request;
+            if ($request->get('page')) {
+                $this->page = (int) $request->get('page');
+            }
+            if ($request->get('per_page')) {
+                $this->perPage = (int) $request->get('per_page');
+            }
         }
     }
 }
